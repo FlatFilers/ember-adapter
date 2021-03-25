@@ -6,21 +6,20 @@ import { hbs } from 'ember-cli-htmlbars';
 module('Integration | Component | flatfile-button', function (hooks) {
   setupRenderingTest(hooks);
 
-  test('it renders', async function (assert) {
-    // Set any properties with this.set('myProperty', 'value');
-    // Handle any actions with this.set('myAction', function(val) { ... });
-
-    await render(hbs`<FlatfileButton />`);
-
-    assert.equal(this.element.textContent.trim(), '');
-
-    // Template block usage:
+  test('it renders a button element with yielded text', async function (assert) {
     await render(hbs`
       <FlatfileButton>
-        template block text
+        yielded text
       </FlatfileButton>
     `);
 
-    assert.equal(this.element.textContent.trim(), 'template block text');
+    assert.dom('button').includesText('yielded text');
+  });
+
+  test('it can pass attributes to the button element', async function (assert) {
+    await render(hbs`<FlatfileButton class="foo" data-test />`);
+
+    assert.dom('button').hasClass('foo');
+    assert.dom('button').hasAttribute('data-test');
   });
 });
