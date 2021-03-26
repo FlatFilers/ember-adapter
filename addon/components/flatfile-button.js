@@ -1,9 +1,11 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import FlatfileImporter from '@flatfile/adapter';
 import { tracked } from '@glimmer/tracking';
+import { action } from '@ember/object';
+import { inject as service } from '@ember/service';
 
 export default class extends Component {
+  @service flatfile;
+
   @tracked isLoading = this.args.preload !== false;
   @tracked isReady = false;
 
@@ -15,9 +17,10 @@ export default class extends Component {
   initializeFlatfileImporter() {
     this.isLoading = true;
 
-    if (this.args.mountUrl) FlatfileImporter.setMountUrl(this.args.mountUrl);
+    if (this.args.mountUrl)
+      this.flatfile.importer.setMountUrl(this.args.mountUrl);
 
-    this.flatfileImporter = new FlatfileImporter(
+    this.flatfileImporter = new this.flatfile.importer(
       this.args.licenseKey,
       this.args.settings,
       this.args.customer
