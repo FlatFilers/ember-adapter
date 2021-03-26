@@ -43,6 +43,27 @@ module('Integration | Component | flatfile-button', function (hooks) {
     assert.dom('button').hasAttribute('data-test');
   });
 
+  test('it can pass the licenseKey, settings and customer to the importer', async function (assert) {
+    let importerSpy = sinon.spy(
+      this.owner.lookup('service:flatfile'),
+      'importer'
+    );
+    this.licenseKey = 'foo';
+    this.settings = { foo: 'bar' };
+    this.customer = { name: 'cloud' };
+
+    await render(hbs`
+      <FlatfileButton
+        @licenseKey='foo'
+        @settings={{this.settings}}
+        @customer={{this.customer}} />
+    `);
+
+    assert.ok(
+      importerSpy.calledWith(this.licenseKey, this.settings, this.customer)
+    );
+  });
+
   test('it can yield an isLoading state (default preload=true)', async function (assert) {
     await render(hbs`
       <FlatfileButton as | status |>
