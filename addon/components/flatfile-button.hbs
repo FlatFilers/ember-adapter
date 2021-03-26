@@ -2,5 +2,8 @@
   type="button"
   ...attributes
   {{on "click" this.loadImporter}}>
-  {{yield}}
+  {{yield (hash
+    isLoading=this.isLoading
+    isReady=this.isReady
+  )}}
 </button>
