@@ -4,7 +4,7 @@ We've made it really simple for you to get started with Flatfile with our new Fl
 
 First, install the dependency via npm:
 
-`npm install @flatfile/ember`
+`ember install @flatfile/ember`
 
 This will give you access to the `<FlatfileButton />` component as well as the same basic functionality as our Adapter.
 
