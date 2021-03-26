@@ -39,10 +39,16 @@ This will give you access to the `<FlatfileButton />` component as well as the s
 |`render`- An optional way to pass in your own elements to render inside the FlatfileButton Component.|Optional. <br />function |`render={`<br />`(`[`FlatfileImporter`](https://developers.flatfile.io/docs/sdk/classes/flatfileimporter)`, `[`launch`](https://github.com/FlatFilers/react-adapter/blob/master/src/components/FlatFileButton.tsx#L83)`) => return ReactElement}`|
 |`preload`- An optional flag that can be set to `false` to delay loading the importer until the button is clicked. Useful in situations where there is more than one `<FlatfileButton/>` instance on a single page or minimizing page load size is important. Default is `true`.|Optional. <br />boolean |`preload={false}`|
 
+The component also yields out the component state to allow handling of loading states how you wish.
+
+```hbs
+  as | status |> {{! status.example }}
+```
+
 | **<u>FlatfileButton Yields</u>**                                                                                        | **<u>Info</u>**               | <u>**Example**</u>                     |
 | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
-|`isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `as | status |> {{! status.isLoading }}` |
-|`isReady` - starts false, becomes true when Flatfile has been initialized and loaded | _boolean_ | `as | status |> {{! status.isReady }}` |
+|`isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `status.isLoading` |
+|`isReady` - starts false, becomes true when Flatfile has been initialized and loaded | _boolean_ | `status.isReady` |
 
 Try our example in... TODO, make Ember Twiddle
 
