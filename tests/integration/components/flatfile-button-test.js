@@ -6,6 +6,8 @@ import sinon from 'sinon';
 import Service from '@ember/service';
 
 let resolveReady = () => {};
+let resolveRequestData = () => {};
+let rejectRequestData = () => {};
 class flatfileServiceStub extends Service {
   importer = importerStub;
 }
@@ -14,9 +16,14 @@ class importerStub {
     this.$ready = new Promise((resolve) => {
       resolveReady = resolve;
     });
-  }
 
-  open = sinon.stub();
+    this.requestDataFromUser = () => {
+      return new Promise((resolve, reject) => {
+        resolveRequestData = resolve;
+        rejectRequestData = reject;
+      });
+    }
+  }
 }
 
 module('Integration | Component | flatfile-button', function (hooks) {
@@ -111,5 +118,23 @@ module('Integration | Component | flatfile-button', function (hooks) {
     await settled();
 
     assert.dom('button').includesText('true');
+  });
+
+  test('it fires a cancel action when the user cancels', async function (assert) {
+    this.handleCancel = () => assert.step('canceled');
+    await render(hbs`
+      <FlatfileButton
+        @onCancel={{this.handleCancel}}
+        as | status |>
+        {{status.isReady}}
+      </FlatfileButton>
+    `);
+    resolveReady();
+    await settled();
+    await click('button');
+
+    rejectRequestData();
+    await settled();
+    assert.verifySteps(['canceled']);
   });
 });
