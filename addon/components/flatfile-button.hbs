@@ -1,3 +1,6 @@
-<button ...attributes>
+<button
+  type="button"
+  ...attributes
+  {{on "click" this.loadImporter}}>
   {{yield}}
 </button>
