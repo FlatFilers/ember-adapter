@@ -76,4 +76,19 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
     assert.dom('button').includesText('false');
   });
+
+  test('it can yield an isReady state', async function (assert) {
+    await render(hbs`
+      <FlatfileButton as | status |>
+        {{status.isReady}}
+      </FlatfileButton>
+    `);
+
+    assert.dom('button').includesText('false');
+
+    await resolveReady();
+    await settled();
+
+    assert.dom('button').includesText('true');
+  });
 });
