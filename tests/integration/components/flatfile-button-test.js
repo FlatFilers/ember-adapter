@@ -1,17 +1,22 @@
 import { module, test } from 'qunit';
 import { setupRenderingTest } from 'ember-qunit';
-import { render } from '@ember/test-helpers';
+import { render, settled, click } from '@ember/test-helpers';
 import { hbs } from 'ember-cli-htmlbars';
-// import sinon from 'sinon';
+import sinon from 'sinon';
 import Service from '@ember/service';
 
+let resolveReady = () => {};
 class flatfileServiceStub extends Service {
   importer = importerStub;
 }
 class importerStub {
   constructor() {
-    this.$ready = new Promise((resolve) => resolve());
+    this.$ready = new Promise((resolve) => {
+      resolveReady = resolve;
+    });
   }
+
+  open = sinon.stub();
 }
 
 module('Integration | Component | flatfile-button', function (hooks) {
@@ -36,5 +41,39 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
     assert.dom('button').hasClass('foo');
     assert.dom('button').hasAttribute('data-test');
+  });
+
+  test('it can yield an isLoading state (default preload=true)', async function (assert) {
+    await render(hbs`
+      <FlatfileButton as | status |>
+        {{status.isLoading}}
+      </FlatfileButton>
+    `);
+
+    assert.dom('button').includesText('true');
+
+    await resolveReady();
+    await settled();
+
+    assert.dom('button').includesText('false');
+  });
+
+  test('it can yield an isLoading state (preload=false)', async function (assert) {
+    await render(hbs`
+      <FlatfileButton @preload={{false}} as | status |>
+        {{status.isLoading}}
+      </FlatfileButton>
+    `);
+
+    assert.dom('button').includesText('false');
+
+    await click('button');
+
+    assert.dom('button').includesText('true');
+
+    await resolveReady();
+    await settled();
+
+    assert.dom('button').includesText('false');
   });
 });
