@@ -41,9 +41,29 @@ export default class extends Component {
   }
 
   @action
+  _handleData(results) {
+    // this.flatfileImporter.displayLoader();
+    this.args?.onData(results).then(
+      (optionalMessage) =>
+        optionalMessage !== null
+          ? this.flatfileImporter.displaySuccess(optionalMessage || undefined)
+          : this.flatfileImporter.close(),
+      (error) => {
+        this.flatfileImporter
+          .requestCorrectionsFromUser(
+            error instanceof Error ? error.message : error
+          )
+          .then(this._handleData, this.onCancel);
+      }
+    );
+  }
+
+  @action
   loadImporter() {
     if (!this.flatfileImporter) this.initializeFlatfileImporter();
 
-    this.flatfileImporter.requestDataFromUser().then(noOp, this.onCancel);
+    this.flatfileImporter
+      .requestDataFromUser()
+      .then(this._handleData, this.onCancel);
   }
 }

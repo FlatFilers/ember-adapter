@@ -8,22 +8,23 @@ import Service from '@ember/service';
 let resolveReady = () => {};
 let resolveRequestData = () => {};
 let rejectRequestData = () => {};
+
 class flatfileServiceStub extends Service {
   importer = importerStub;
 }
 class importerStub {
-  constructor() {
-    this.$ready = new Promise((resolve) => {
-      resolveReady = resolve;
-    });
+  $ready = new Promise((resolve) => {
+    resolveReady = resolve;
+  });
 
-    this.requestDataFromUser = () => {
-      return new Promise((resolve, reject) => {
-        resolveRequestData = resolve;
-        rejectRequestData = reject;
-      });
-    }
-  }
+  requestDataFromUser = () => {
+    return new Promise((resolve, reject) => {
+      resolveRequestData = resolve;
+      rejectRequestData = reject;
+    });
+  };
+
+  displaySuccess = sinon.stub();
 }
 
 module('Integration | Component | flatfile-button', function (hooks) {
@@ -121,10 +122,10 @@ module('Integration | Component | flatfile-button', function (hooks) {
   });
 
   test('it fires a cancel action when the user cancels', async function (assert) {
-    this.handleCancel = () => assert.step('canceled');
+    this.onCancel = () => assert.step('canceled');
     await render(hbs`
       <FlatfileButton
-        @onCancel={{this.handleCancel}}
+        @onCancel={{this.onCancel}}
         as | status |>
         {{status.isReady}}
       </FlatfileButton>
@@ -136,5 +137,28 @@ module('Integration | Component | flatfile-button', function (hooks) {
     rejectRequestData();
     await settled();
     assert.verifySteps(['canceled']);
+  });
+
+  test('it connects to onData', async function (assert) {
+    this.onData = () => {
+      return new Promise((resolve) => {
+        assert.step('onData');
+        resolve('success!');
+      });
+    };
+    await render(hbs`
+      <FlatfileButton
+        @onData={{this.onData}}
+        as | status |>
+        {{status.isReady}}
+      </FlatfileButton>
+    `);
+    resolveReady();
+    await settled();
+    await click('button');
+
+    resolveRequestData();
+    await settled();
+    assert.verifySteps(['onData']);
   });
 });
