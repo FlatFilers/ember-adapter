@@ -16,7 +16,8 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubClose,
     stubSetMountUrl,
     stubRegisterBeforeFetchCallback,
-    stubRegisterInteractionEventCallback;
+    stubRegisterInteractionEventCallback,
+    stubRegisterRecordHook;
 
   hooks.beforeEach(function (assert) {
     resolveReady = () => {};
@@ -28,6 +29,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubSetMountUrl = sinon.stub();
     stubRegisterBeforeFetchCallback = sinon.stub();
     stubRegisterInteractionEventCallback = sinon.stub();
+    stubRegisterRecordHook = sinon.stub();
 
     class stubFlatfileService extends Service {
       importer = stubImporter;
@@ -57,6 +59,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       close = stubClose;
       registerBeforeFetchCallback = stubRegisterBeforeFetchCallback;
       registerInteractionEventCallback = stubRegisterInteractionEventCallback;
+      registerRecordHook = stubRegisterRecordHook;
     }
 
     this.owner.register('service:flatfile', stubFlatfileService);
@@ -172,16 +175,21 @@ module('Integration | Component | flatfile-button', function (hooks) {
     this.mountUrl = 'custom mount url';
     this.onBeforeFetch = () => {};
     this.onInteractionEvent = () => {};
+    this.onRecordChange = () => {};
     await render(hbs`
       <FlatfileButton
         @onBeforeFetch={{this.onBeforeFetch}}
         @onInteractionEvent={{this.onInteractionEvent}}
+        @onRecordChange={{this.onRecordChange}}
         @mountUrl={{this.mountUrl}} />
     `);
 
     assert.ok(stubSetMountUrl.calledWith(this.mountUrl));
     assert.ok(stubRegisterBeforeFetchCallback.calledWith(this.onBeforeFetch));
-    assert.ok(stubRegisterInteractionEventCallback.calledWith(this.onInteractionEvent));
+    assert.ok(
+      stubRegisterInteractionEventCallback.calledWith(this.onInteractionEvent)
+    );
+    assert.ok(stubRegisterRecordHook.called);
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {

@@ -37,6 +37,15 @@ export default class extends Component {
       this.flatfileImporter.registerInteractionEventCallback(
         this.args.onInteractionEvent
       );
+    if (this.args.onRecordChange || this.args.onRecordInit)
+      this.flatfileImporter.registerRecordHook((record, index, eventType) => {
+        if (eventType === 'change' && this.args.onRecordChange) {
+          return this.args.onRecordChange(record, index);
+        }
+        if (eventType === 'init' && this.args.onRecordInit) {
+          return this.args.onRecordInit(record, index);
+        }
+      });
 
     this.initializeFlatfileImporterEvents();
   }
