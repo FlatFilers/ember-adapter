@@ -5,32 +5,41 @@ import { hbs } from 'ember-cli-htmlbars';
 import sinon from 'sinon';
 import Service from '@ember/service';
 
-let resolveReady = () => {};
-let resolveRequestData = () => {};
-let rejectRequestData = () => {};
-
-class flatfileServiceStub extends Service {
-  importer = importerStub;
-}
-class importerStub {
-  $ready = new Promise((resolve) => {
-    resolveReady = resolve;
-  });
-
-  requestDataFromUser = () => {
-    return new Promise((resolve, reject) => {
-      resolveRequestData = resolve;
-      rejectRequestData = reject;
-    });
-  };
-
-  displaySuccess = sinon.stub();
-}
-
 module('Integration | Component | flatfile-button', function (hooks) {
   setupRenderingTest(hooks);
 
+  let resolveReady,
+    resolveRequestData,
+    rejectRequestData,
+    stubDisplaySuccess,
+    stubDisplayLoader;
+
   hooks.beforeEach(function () {
+    resolveReady = () => {};
+    resolveRequestData = () => {};
+    rejectRequestData = () => {};
+    stubDisplaySuccess = sinon.stub();
+    stubDisplayLoader = sinon.stub();
+
+    class flatfileServiceStub extends Service {
+      importer = importerStub;
+    }
+    class importerStub {
+      $ready = new Promise((resolve) => {
+        resolveReady = resolve;
+      });
+
+      requestDataFromUser = () => {
+        return new Promise((resolve, reject) => {
+          resolveRequestData = resolve;
+          rejectRequestData = reject;
+        });
+      };
+
+      displaySuccess = stubDisplaySuccess;
+      displayLoader = stubDisplayLoader;
+    }
+
     this.owner.register('service:flatfile', flatfileServiceStub);
   });
 
@@ -156,9 +165,11 @@ module('Integration | Component | flatfile-button', function (hooks) {
     resolveReady();
     await settled();
     await click('button');
-
     resolveRequestData();
     await settled();
+
+    assert.ok(stubDisplayLoader.called);
+    assert.ok(stubDisplaySuccess.called);
     assert.verifySteps(['onData']);
   });
 });

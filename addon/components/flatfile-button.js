@@ -42,7 +42,7 @@ export default class extends Component {
 
   @action
   _handleData(results) {
-    // this.flatfileImporter.displayLoader();
+    this.flatfileImporter.displayLoader();
     this.args?.onData(results).then(
       (optionalMessage) =>
         optionalMessage !== null
