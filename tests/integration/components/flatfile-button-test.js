@@ -25,11 +25,11 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubClose = sinon.stub();
     stubSetMountUrl = sinon.stub();
 
-    class flatfileServiceStub extends Service {
-      importer = importerStub;
+    class stubFlatfileService extends Service {
+      importer = stubImporter;
       setMountUrl = stubSetMountUrl;
     }
-    class importerStub {
+    class stubImporter {
       $ready = new Promise((resolve) => {
         resolveReady = resolve;
       });
@@ -53,7 +53,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       close = stubClose;
     }
 
-    this.owner.register('service:flatfile', flatfileServiceStub);
+    this.owner.register('service:flatfile', stubFlatfileService);
   });
 
   test('it renders a button element with yielded text', async function (assert) {
