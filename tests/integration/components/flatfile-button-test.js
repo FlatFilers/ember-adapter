@@ -15,7 +15,8 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubDisplayLoader,
     stubClose,
     stubSetMountUrl,
-    stubRegisterBeforeFetchCallback;
+    stubRegisterBeforeFetchCallback,
+    stubRegisterInteractionEventCallback;
 
   hooks.beforeEach(function (assert) {
     resolveReady = () => {};
@@ -26,6 +27,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubClose = sinon.stub();
     stubSetMountUrl = sinon.stub();
     stubRegisterBeforeFetchCallback = sinon.stub();
+    stubRegisterInteractionEventCallback = sinon.stub();
 
     class stubFlatfileService extends Service {
       importer = stubImporter;
@@ -54,6 +56,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       displayLoader = stubDisplayLoader;
       close = stubClose;
       registerBeforeFetchCallback = stubRegisterBeforeFetchCallback;
+      registerInteractionEventCallback = stubRegisterInteractionEventCallback;
     }
 
     this.owner.register('service:flatfile', stubFlatfileService);
@@ -168,14 +171,17 @@ module('Integration | Component | flatfile-button', function (hooks) {
   test('it sets up optional callbacks, hooks and mountUrl', async function (assert) {
     this.mountUrl = 'custom mount url';
     this.onBeforeFetch = () => {};
+    this.onInteractionEvent = () => {};
     await render(hbs`
       <FlatfileButton
         @onBeforeFetch={{this.onBeforeFetch}}
+        @onInteractionEvent={{this.onInteractionEvent}}
         @mountUrl={{this.mountUrl}} />
     `);
 
     assert.ok(stubSetMountUrl.calledWith(this.mountUrl));
     assert.ok(stubRegisterBeforeFetchCallback.calledWith(this.onBeforeFetch));
+    assert.ok(stubRegisterInteractionEventCallback.calledWith(this.onInteractionEvent));
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {

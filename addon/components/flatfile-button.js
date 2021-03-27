@@ -33,6 +33,10 @@ export default class extends Component {
       this.flatfileImporter.registerBeforeFetchCallback(
         this.args.onBeforeFetch
       );
+    if (this.args.onInteractionEvent)
+      this.flatfileImporter.registerInteractionEventCallback(
+        this.args.onInteractionEvent
+      );
 
     this.initializeFlatfileImporterEvents();
   }
