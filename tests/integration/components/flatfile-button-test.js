@@ -13,7 +13,8 @@ module('Integration | Component | flatfile-button', function (hooks) {
     rejectRequestData,
     stubDisplaySuccess,
     stubDisplayLoader,
-    stubClose;
+    stubClose,
+    stubSetMountUrl;
 
   hooks.beforeEach(function (assert) {
     resolveReady = () => {};
@@ -22,9 +23,11 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubDisplaySuccess = sinon.stub();
     stubDisplayLoader = sinon.stub();
     stubClose = sinon.stub();
+    stubSetMountUrl = sinon.stub();
 
     class flatfileServiceStub extends Service {
       importer = importerStub;
+      setMountUrl = stubSetMountUrl;
     }
     class importerStub {
       $ready = new Promise((resolve) => {
@@ -157,6 +160,16 @@ module('Integration | Component | flatfile-button', function (hooks) {
     rejectRequestData();
     await settled();
     assert.verifySteps(['requestDataFromUser', 'canceled']);
+  });
+
+  test('it sets up optional callbacks, hooks and mountUrl', async function (assert) {
+    this.mountUrl = 'custom mount url';
+    await render(hbs`
+      <FlatfileButton
+        @mountUrl={{this.mountUrl}} />
+    `);
+
+    assert.ok(stubSetMountUrl.calledWith(this.mountUrl));
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {

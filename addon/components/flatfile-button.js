@@ -22,7 +22,7 @@ export default class extends Component {
     this.isLoading = true;
 
     if (this.args.mountUrl)
-      this.flatfile.importer.setMountUrl(this.args.mountUrl);
+      this.flatfile.setMountUrl(this.args.mountUrl);
 
     this.flatfileImporter = new this.flatfile.importer(
       this.args.licenseKey,
