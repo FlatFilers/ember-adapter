@@ -14,7 +14,8 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubDisplaySuccess,
     stubDisplayLoader,
     stubClose,
-    stubSetMountUrl;
+    stubSetMountUrl,
+    stubRegisterBeforeFetchCallback;
 
   hooks.beforeEach(function (assert) {
     resolveReady = () => {};
@@ -24,6 +25,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubDisplayLoader = sinon.stub();
     stubClose = sinon.stub();
     stubSetMountUrl = sinon.stub();
+    stubRegisterBeforeFetchCallback = sinon.stub();
 
     class stubFlatfileService extends Service {
       importer = stubImporter;
@@ -51,6 +53,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       displaySuccess = stubDisplaySuccess;
       displayLoader = stubDisplayLoader;
       close = stubClose;
+      registerBeforeFetchCallback = stubRegisterBeforeFetchCallback;
     }
 
     this.owner.register('service:flatfile', stubFlatfileService);
@@ -164,12 +167,15 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
   test('it sets up optional callbacks, hooks and mountUrl', async function (assert) {
     this.mountUrl = 'custom mount url';
+    this.onBeforeFetch = () => {};
     await render(hbs`
       <FlatfileButton
+        @onBeforeFetch={{this.onBeforeFetch}}
         @mountUrl={{this.mountUrl}} />
     `);
 
     assert.ok(stubSetMountUrl.calledWith(this.mountUrl));
+    assert.ok(stubRegisterBeforeFetchCallback.calledWith(this.onBeforeFetch));
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {
