@@ -15,7 +15,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     stubDisplayLoader,
     stubClose;
 
-  hooks.beforeEach(function () {
+  hooks.beforeEach(function (assert) {
     resolveReady = () => {};
     resolveRequestData = () => {};
     rejectRequestData = () => {};
@@ -33,8 +33,15 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
       requestDataFromUser = () => {
         return new Promise((resolve, reject) => {
+          assert.step('requestDataFromUser');
           resolveRequestData = resolve;
           rejectRequestData = reject;
+        });
+      };
+
+      requestCorrectionsFromUser = () => {
+        return new Promise(() => {
+          assert.step('requestCorrectionsFromUser');
         });
       };
 
@@ -116,6 +123,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     await settled();
 
     assert.dom('button').includesText('false');
+    assert.verifySteps(['requestDataFromUser']);
   });
 
   test('it can yield an isReady state', async function (assert) {
@@ -148,7 +156,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
     rejectRequestData();
     await settled();
-    assert.verifySteps(['canceled']);
+    assert.verifySteps(['requestDataFromUser', 'canceled']);
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {
@@ -176,7 +184,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       stubDisplaySuccess.calledWith('success!'),
       'called display success'
     );
-    assert.verifySteps(['onData']);
+    assert.verifySteps(['requestDataFromUser', 'onData']);
   });
 
   test('it allows onData to resolve without display message (set to null)', async function (assert) {
@@ -201,6 +209,34 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
     assert.ok(stubDisplayLoader.called, 'called loader');
     assert.ok(stubClose.called, 'called close');
-    assert.verifySteps(['onData']);
+    assert.verifySteps(['requestDataFromUser', 'onData']);
+  });
+
+  test('it allows onData to reject with an error message', async function (assert) {
+    this.onData = () => {
+      return new Promise((_, reject) => {
+        assert.step('onData');
+        reject(new Error('uhoh!'));
+      });
+    };
+    await render(hbs`
+      <FlatfileButton
+        @onData={{this.onData}}
+        as | status |>
+        {{status.isReady}}
+      </FlatfileButton>
+    `);
+    resolveReady();
+    await settled();
+    await click('button');
+    resolveRequestData();
+    await settled();
+
+    assert.ok(stubDisplayLoader.called, 'called loader');
+    assert.verifySteps([
+      'requestDataFromUser',
+      'onData',
+      'requestCorrectionsFromUser',
+    ]);
   });
 });
