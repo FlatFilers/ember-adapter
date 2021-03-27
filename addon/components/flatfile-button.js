@@ -29,6 +29,11 @@ export default class extends Component {
       this.args.customer
     );
 
+    if (this.args.fieldHooks) {
+      for (const key in this.args.fieldHooks) {
+        this.flatfileImporter.registerFieldHook(key, this.args.fieldHooks[key]);
+      }
+    }
     if (this.args.onBeforeFetch)
       this.flatfileImporter.registerBeforeFetchCallback(
         this.args.onBeforeFetch
