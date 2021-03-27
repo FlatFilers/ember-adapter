@@ -12,7 +12,8 @@ module('Integration | Component | flatfile-button', function (hooks) {
     resolveRequestData,
     rejectRequestData,
     stubDisplaySuccess,
-    stubDisplayLoader;
+    stubDisplayLoader,
+    stubClose;
 
   hooks.beforeEach(function () {
     resolveReady = () => {};
@@ -20,6 +21,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     rejectRequestData = () => {};
     stubDisplaySuccess = sinon.stub();
     stubDisplayLoader = sinon.stub();
+    stubClose = sinon.stub();
 
     class flatfileServiceStub extends Service {
       importer = importerStub;
@@ -38,6 +40,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
 
       displaySuccess = stubDisplaySuccess;
       displayLoader = stubDisplayLoader;
+      close = stubClose;
     }
 
     this.owner.register('service:flatfile', flatfileServiceStub);
@@ -148,7 +151,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
     assert.verifySteps(['canceled']);
   });
 
-  test('it connects to onData', async function (assert) {
+  test('it allows onData to resolve with a display message', async function (assert) {
     this.onData = () => {
       return new Promise((resolve) => {
         assert.step('onData');
@@ -168,8 +171,36 @@ module('Integration | Component | flatfile-button', function (hooks) {
     resolveRequestData();
     await settled();
 
-    assert.ok(stubDisplayLoader.called);
-    assert.ok(stubDisplaySuccess.called);
+    assert.ok(stubDisplayLoader.called, 'called loader');
+    assert.ok(
+      stubDisplaySuccess.calledWith('success!'),
+      'called display success'
+    );
+    assert.verifySteps(['onData']);
+  });
+
+  test('it allows onData to resolve without display message (set to null)', async function (assert) {
+    this.onData = () => {
+      return new Promise((resolve) => {
+        assert.step('onData');
+        resolve(null);
+      });
+    };
+    await render(hbs`
+      <FlatfileButton
+        @onData={{this.onData}}
+        as | status |>
+        {{status.isReady}}
+      </FlatfileButton>
+    `);
+    resolveReady();
+    await settled();
+    await click('button');
+    resolveRequestData();
+    await settled();
+
+    assert.ok(stubDisplayLoader.called, 'called loader');
+    assert.ok(stubClose.called, 'called close');
     assert.verifySteps(['onData']);
   });
 });
