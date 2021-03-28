@@ -1,9 +1,24 @@
-<button
-  type="button"
-  ...attributes
-  {{on "click" this.loadImporter}}>
-  {{yield (hash
-    isLoading=this.isLoading
-    isReady=this.isReady
-  )}}
-</button>
+<FlatfileProvider
+  @licenseKey={{@licenseKey}}
+  @customer={{@customer}}
+  @settings={{@settings}}
+  @onCancel={{@onCancel}}
+  @onInteractionEvent={{@onInteractionEvent}}
+  @onBeforeFetch={{@onBeforeFetch}}
+  @onData={{@onData}}
+  @onRecordInit={{@onRecordInit}}
+  @onRecordChange={{@onRecordChange}}
+  @fieldHooks={{@fieldHooks}}
+  @mountUrl={{@mountUrl}}
+  @preload={{@preload}}
+  as | flatfile |>
+  <button
+    type="button"
+    ...attributes
+    {{on "click" flatfile.open}}>
+    {{yield (hash
+      isLoading=flatfile.state.isLoading
+      isReady=flatfile.state.isReady
+    )}}
+  </button>
+</FlatfileProvider>
