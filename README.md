@@ -77,7 +77,7 @@ The component also yields out the component state to allow handling of loading s
   as | flatfile |>
 ```
 
-| **<u>FlatfileButton Yields</u>**                                                                                        | **<u>Info</u>**               | <u>**Example**</u>                     |
+| **<u>FlatfileProvider Yields</u>**                                                                                        | **<u>Info</u>**               | <u>**Example**</u>                     |
 | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
 |`flatfile.open` - can be tied to an event to open the flatfile importer, this is the default click event for FlatfileButton | _action_ or _function_ | `{{on "click" flatfile.open}}` |
 |`flatfile.state.isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `flatfile.state.isLoading` |
