@@ -8,7 +8,7 @@ First, install the dependency via npm:
 
 This will give you access to the `<FlatfileButton />` component as well as the same basic functionality as our Adapter.
 
-## The FlatfileButton usage
+## FlatfileButton usage
 
 ```hbs
 <FlatfileButton
@@ -25,7 +25,7 @@ This will give you access to the `<FlatfileButton />` component as well as the s
 </FlatfileButton>
 ```
 
-| **<u>FlatfileButton Props</u>**                                                                                         | **<u>Info</u>**               | <u>**Example**</u>                     |
+| **<u>FlatfileButton Arguments</u>**                                                                                         | **<u>Info</u>**               | <u>**Example**</u>                     |
 | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
 |`licenseKey` - Your Flatfile license key can be found in your dashboard when you [login here](https://app.flatfile.io/login).|**Required**. <br /> _string_ | `licenseKey={'ah12-alksjs2738-shdkaj123'}` |
 |`customer` - Refers to the _[setCustomer function](https://developers.flatfile.io/docs/sdk/classes/flatfileimporter#setcustomer)_. | **Required**. <br /> _object_ - [_CustomerObject_](https://developers.flatfile.io/docs/sdk/interfaces/customerobject) | `customer={{` <br />`usedId: "1234",`<br />`companyId: "12",`<br />` companyName: "ABC",`<br />`email: "john@doe.com",`<br />`name: "John Doe"`<br />`}}`|
@@ -42,13 +42,43 @@ This will give you access to the `<FlatfileButton />` component as well as the s
 The component also yields out the component state to allow handling of loading states how you wish.
 
 ```hbs
-  as | status |> {{! status.example }}
+  as | flatfileState |>
 ```
 
 | **<u>FlatfileButton Yields</u>**                                                                                        | **<u>Info</u>**               | <u>**Example**</u>                     |
 | ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
-|`isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `status.isLoading` |
-|`isReady` - starts false, becomes true when Flatfile has been initialized and loaded | _boolean_ | `status.isReady` |
+|`isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `flatfileState.isLoading` |
+|`isReady` - starts false, becomes true when Flatfile has been initialized and loaded | _boolean_ | `flatfileState.isReady` |
 
-Try our example in... TODO, make Ember Twiddle
+## FlatfileProvider usage
 
+```hbs
+<FlatfileProvider
+  @licenseKey="License Key Here"
+  @customer={{hash userId="12345"}}
+  @settings={{hash
+    type="Contract"
+    fields=(array
+      (hash label="Full Name" key="name")
+      (hash label="Email" key="name")
+    )
+  }} as | flatfile |>
+  <a href="#" {{on "click" flatfile.open}}>
+    FlatfileProvider with html anchor link
+  </a>
+</FlatfileProvider>
+```
+
+All of the same component arguments are available for FlatfileProvider as are available above for FlatfileButton.
+
+The component also yields out the component state to allow handling of loading states how you wish.
+
+```hbs
+  as | flatfile |>
+```
+
+| **<u>FlatfileButton Yields</u>**                                                                                        | **<u>Info</u>**               | <u>**Example**</u>                     |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------------------------------- |
+|`flatfile.open` - can be tied to an event to open the flatfile importer, this is the default click event for FlatfileButton | _action_ or _function_ | `{{on "click" flatfile.open}}` |
+|`flatfile.state.isLoading` - start true if the preload argument is true, otherwise is false until loading starts | _boolean_ | `flatfile.state.isLoading` |
+|`flatfile.state.isReady` - starts false, becomes true when Flatfile has been initialized and loaded | _boolean_ | `flatfile.state.isReady` |
