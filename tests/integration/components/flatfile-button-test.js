@@ -195,7 +195,7 @@ module('Integration | Component | flatfile-button', function (hooks) {
       stubRegisterInteractionEventCallback.calledWith(this.onInteractionEvent)
     );
     assert.ok(stubRegisterRecordHook.called);
-    assert.ok(stubRegisterFieldHook.calledWith(Object.keys(this.fieldHooks)[0], this.fieldHooks[0]);
+    assert.ok(stubRegisterFieldHook.calledWith('foo', this.fieldHooks['foo']));
   });
 
   test('it allows onData to resolve with a display message', async function (assert) {
